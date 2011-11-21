@@ -1,0 +1,6 @@
+#summary The landing page for the Wiki documentation
+#labels Featured
+
+= SimpleSAMLphp - GoogleApps=
+
+Details to come.
