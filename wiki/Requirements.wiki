@@ -18,4 +18,4 @@ In order to provide provisioning delay's and username change tracking, this modu
 
 === Data Directory ===
 
-Not many other modules use the data directory so it may not be writable by PHP. This module saves temporary Google Apps API connection information here. Please make sure the proper permissions are set so that SimpleSAMLphp can write to the directory.
+Not many other modules use the *`simplesamlphp/data`* directory so it may not be writable by PHP. This module saves temporary Google Apps API connection information here. Please make sure the proper permissions are set so that SimpleSAMLphp can write to the directory.
