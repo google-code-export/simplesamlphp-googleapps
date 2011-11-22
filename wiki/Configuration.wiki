@@ -1,6 +1,22 @@
 #summary Configuration options for the module
 
-= Configuration Options =
+= Module Configuration =
+
+The configuration of the module is meant to be simple yet flexible. However, there are a couple things to configure before you are up-and-running. First, let Google Apps allow the module to provision/create new accounts. Second, tell the module how to connect to Google Apps.
+
+== Google Apps Configuration ==
+
+Before this module can be used, the Provisioning API must be enabled in your Google Apps Dashboard. This allows the module to communicate with and manage your Google Apps environment.
+
+  # Visit your Google Apps domain Dashboard (ex: http://www.google.com/a/example.org/)
+  # Login as a Google Apps domain admin
+  # Click on the *Domain settings* at the top
+  # Click on the *User settings* tab
+  # Check the *Enable provisioning API* option
+  # Click the *Save changes* button
+  # Click on the *Dashboard* at the top, you should now see a warning at the top "_API access is enabled..._" which is OK
+
+== Configuration Options ==
 
 TODO: Finish
 
