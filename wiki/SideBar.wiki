@@ -3,4 +3,6 @@
   * [Requirements]
   * [Installation]
   * [Configuration]
+    * [Options]
+    * [Filters]
   * [Support]
