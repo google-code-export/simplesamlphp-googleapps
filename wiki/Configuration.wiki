@@ -1,0 +1,31 @@
+#summary Configuration options for the module
+
+= Configuration Options =
+
+TODO: Finish
+
+{{{
+$config = array(
+
+	'apps.domain' => '',
+	'apps.username' => '',
+	'apps.password' => '',
+	'apps.timeout' => 30,
+
+	'chain.filters' => array('Provision', 'Organize'),
+	'provision.interval' => 86400, // 24 hours
+	'provision.delay' => 600, // 10 minutes
+
+	'attribute.userid' => 'objectGUID',
+	'attribute.username' => 'sAMAccountName',
+	'attribute.firstname' => 'givenName',
+	'attribute.lastname' => 'sn',
+	'attribute.dn' => 'distinguishedName',
+
+	'pdo.dsn' => 'sqlite:/datadir/googleapps_domain.sqlite',
+	'pdo.username' => NULL,
+	'pdo.password' => NULL,
+	'pdo.prefix' => 'googleapps',
+	'pdo.options' => array()
+);
+}}}
