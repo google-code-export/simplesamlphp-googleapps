@@ -1,0 +1,3 @@
+#summary Configuration options used in the module/filters
+
+Move config options and details here.
