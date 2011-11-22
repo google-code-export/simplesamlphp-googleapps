@@ -1,4 +1,6 @@
 #summary Sidebar page to create navigation links on all pages
- * Requirements
- * Installation
- * Support
+  * [HomePage Homepage]
+  * [Requirements]
+  * [Installation]
+  * [Configuration]
+  * [Support]
