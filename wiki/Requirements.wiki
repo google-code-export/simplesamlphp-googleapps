@@ -10,7 +10,7 @@ In addition to the [http://simplesamlphp.org/docs/trunk/simplesamlphp-install#se
 
 === cURL Extension ===
 
-This module utilizes the highly used [http://www.php.net/manual/en/book.curl.php PHP cURL extension] to communicate with the Google Apps API via HTTP. Verify that it is enabled by checking the [http://us2.php.net/manual/en/function.phpinfo.php php_info()] for a cURL section. To enable, modify your php.ini file and un-comment the extension.
+This module utilizes the highly used [http://www.php.net/manual/en/book.curl.php PHP cURL extension] to communicate with the Google Apps API via HTTP. Verify that it is enabled by checking the [http://www.php.net/manual/en/function.phpinfo.php php_info()] for a cURL section. To enable, modify your php.ini file and un-comment the extension.
 
 === PDO Extension ===
 
