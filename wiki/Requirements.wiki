@@ -14,7 +14,7 @@ This module utilizes the highly used [http://www.php.net/manual/en/book.curl.php
 
 === PDO Extension ===
 
-In order to provide provisioning delay's and username change tracking, this module saves information into a database. It supports [http://us3.php.net/manual/en/book.pdo.php PDO] so different database backend products can be used. Verify that it is enabled by checking the [http://us2.php.net/manual/en/function.phpinfo.php php_info()] for a PDO section. To enable, modify your php.ini file and un-comment the extension and specific driver extension.
+In order to provide provisioning delay's and username change tracking, this module saves information into a database. It supports [http://www.php.net/manual/en/book.pdo.php PDO] so different database backend products can be used. Verify that it is enabled by checking the [http://www.php.net/manual/en/function.phpinfo.php php_info()] for a PDO section. To enable, modify your php.ini file and un-comment the extension and specific driver extension.
 
 === Data Directory ===
 
