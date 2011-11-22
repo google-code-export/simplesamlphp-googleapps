@@ -11,7 +11,7 @@ The zip download simply contains the googleapps module folder which you extract 
   # Visit the [https://code.google.com/p/simplesamlphp-googleapps/downloads/list Downloads] page to get the latest release
   # Unpack/copy the *`googleapps`* folder to the *`simplesamlphp/modules`* folder
   # Make a new, empty file in the *`simplesamlphp/modules/googleapps`* folder named *`enable`*, with no extension
-  # *`googleapps`* module should now be installed and enabled, continue to the configuration
+  # *`googleapps`* module should now be installed and enabled, continue to the [Configuration]
 
 === Pack.php Tool ===
 
@@ -20,7 +20,7 @@ To use the pack.php tool, you'll need command line / SSH access to the SimpleSAM
   # SSH into the box where SimpleSAMLphp is installed
   # *`cd`* to the SimpleSAMLphp installation directory
   # Execute the command *`bin/pack.php install http://simplesamlphp-googleapps.googlecode.com/svn/trunk/definition.json`*
-  # *`googleapps`* module should now be installed and enabled, continue to the configuration
+  # *`googleapps`* module should now be installed and enabled, continue to the [Configuration]
 
 ==== Branches ====
 
