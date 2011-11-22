@@ -2,11 +2,11 @@
 
 = Module Configuration =
 
-The configuration of the module is meant to be simple yet flexible. However, there are a couple things to configure before you are up-and-running. First, let Google Apps allow the module to provision/create new accounts. Second, tell the module how to connect to Google Apps.
+The configuration of the module is meant to be simple yet flexible. However, there are a few things to configure before you are up-and-running. First, let Google Apps allow the module to provision/create new accounts. Second, tell the module how to connect to Google Apps. Lastly, enable the module filters so that SimpleSAMLphp runs them.
 
 == Google Apps Configuration ==
 
-Before this module can be used, the Provisioning API must be enabled in your Google Apps Dashboard. This allows the module to communicate with and manage your Google Apps environment.
+Before this module can be used, the Provisioning API must be enabled in your Google Apps Dashboard. This allows the module to communicate with and manage your Google Apps users.
 
   # Visit your Google Apps domain Dashboard (ex: http://www.google.com/a/example.org/)
   # Login as a Google Apps domain admin
@@ -18,7 +18,7 @@ Before this module can be used, the Provisioning API must be enabled in your Goo
 
 == Configuration Options ==
 
-TODO: Finish
+These are the configuration options for the module. They can be defined in either the module config file or the filter config. This section just describes what each option does.
 
 {{{
 $config = array(
@@ -29,6 +29,7 @@ $config = array(
 	'apps.timeout' => 30,
 
 	'chain.filters' => array('Provision', 'Organize'),
+	'provision.password' => NULL,
 	'provision.interval' => 86400, // 24 hours
 	'provision.delay' => 600, // 10 minutes
 
@@ -38,10 +39,40 @@ $config = array(
 	'attribute.lastname' => 'sn',
 	'attribute.dn' => 'distinguishedName',
 
-	'pdo.dsn' => 'sqlite:/datadir/googleapps_domain.sqlite',
+	'pdo.dsn' => 'sqlite:/%%DATADIR%%/googleapps_%%DOMAIN%%.sqlite',
 	'pdo.username' => NULL,
 	'pdo.password' => NULL,
 	'pdo.prefix' => 'googleapps',
 	'pdo.options' => array()
 );
 }}}
+
+== Config File ==
+
+The module filters can be set to look at a config file for their options. This is helpful to keep all the settings in one place, easier to update in the future. You can also have more than one config file, in the case where you have multiple domains. These files should be saved in the *`simplesamlphp/config`* folder. The default file name is *`googleapps.php`* but you can define a specific file name in the filter config.
+
+==== Example ====
+
+{{{
+<?php
+$config = array(
+	'apps.domain' => 'example.org',
+	'apps.username' => 'my_admin',
+	'apps.password' => 'Abc123!',
+	'provision.delay' => 300, // 5 minutes
+	'provision.interval' => 57600, // 16 hours
+	'chain.filters' => array('Provision', 'Organize')
+);
+}}}
+
+== Enable Filter(s) ==
+
+The module includes several filters that can be enabled individually or ran as a group/chain. Each filter has a specific task in Google Apps.
+
+=== Provision Filter ===
+=== Organize Filter ===
+=== Filter Chain ===
+
+Even if a config file is used, the module filters still need to be enabled. Even though there are several ways to enable filters, in this case where Google Apps is probably setup to SSO with SimpleSAMLphp, edit the *`simplesamlphp/metadata/saml20-sp-remote.php`* file.
+
+==== Examples ====
