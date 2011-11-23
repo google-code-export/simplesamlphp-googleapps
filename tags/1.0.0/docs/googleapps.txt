@@ -1,0 +1,14 @@
+googleapps Module
+================
+
+<!--
+	This file is written in Markdown syntax.
+	For more information about how to use the Markdown syntax, read here:
+	http://daringfireball.net/projects/markdown/syntax
+-->
+
+  * Version: `$Id$`
+  * Author: Ryan Panning <panman@traileyes.com>
+  * Package: googleapps
+
+**The documentation for this module is not located here, please visit the [project Wiki](http://code.google.com/p/simplesamlphp-googleapps/wiki/HomePage).**
