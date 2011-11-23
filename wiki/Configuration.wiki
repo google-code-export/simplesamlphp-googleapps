@@ -16,40 +16,9 @@ Before this module can be used, the Provisioning API must be enabled in your Goo
   # Click the *Save changes* button
   # Click on the *Dashboard* at the top, you should now see a warning at the top "_API access is enabled..._" which is OK
 
-== Configuration Options ==
+== Config File (Optional) ==
 
-These are the configuration options for the module. They can be defined in either the module config file or the filter config. This section just describes what each option does.
-
-{{{
-$config = array(
-
-	'apps.domain' => '',
-	'apps.username' => '',
-	'apps.password' => '',
-	'apps.timeout' => 30,
-
-	'chain.filters' => array('Provision', 'Organize'),
-	'provision.password' => NULL,
-	'provision.interval' => 86400, // 24 hours
-	'provision.delay' => 600, // 10 minutes
-
-	'attribute.userid' => 'objectGUID',
-	'attribute.username' => 'sAMAccountName',
-	'attribute.firstname' => 'givenName',
-	'attribute.lastname' => 'sn',
-	'attribute.dn' => 'distinguishedName',
-
-	'pdo.dsn' => 'sqlite:/%%DATADIR%%/googleapps_%%DOMAIN%%.sqlite',
-	'pdo.username' => NULL,
-	'pdo.password' => NULL,
-	'pdo.prefix' => 'googleapps',
-	'pdo.options' => array()
-);
-}}}
-
-== Config File ==
-
-The module filters can be set to look at a config file for their options. This is helpful to keep all the settings in one place, easier to update in the future. You can also have more than one config file, in the case where you have multiple domains. These files should be saved in the *`simplesamlphp/config`* folder. The default file name is *`googleapps.php`* but you can define a specific file name in the filter config.
+The module filters can be set to look at a config file for their [Options options]. This is helpful to keep all the settings in one place, easier to update in the future. You can also have more than one config file, in the case where you have multiple domains. These files should be saved in the *`simplesamlphp/config`* folder. The default file name is *`googleapps.php`* but you can define a specific file name in the filter config.
 
 ==== Example ====
 
@@ -67,12 +36,96 @@ $config = array(
 
 == Enable Filter(s) ==
 
-The module includes several filters that can be enabled individually or ran as a group/chain. Each filter has a specific task in Google Apps.
+Even if a config file is used, the module filters still need to be enabled. There are several ways to enable filters, but in this case where Google Apps is probably setup to SSO with SimpleSAMLphp, we are going to work with the *`simplesamlphp/metadata/saml20-sp-remote.php`* file. Checkout the SimpleSAMLphp documentation for more about [http://simplesamlphp.org/docs/trunk/simplesamlphp-authproc Authentication Processing Filters].
 
-=== Provision Filter ===
-=== Organize Filter ===
-=== Filter Chain ===
-
-Even if a config file is used, the module filters still need to be enabled. Even though there are several ways to enable filters, in this case where Google Apps is probably setup to SSO with SimpleSAMLphp, edit the *`simplesamlphp/metadata/saml20-sp-remote.php`* file.
+  # Edit the *`simplesamlphp/metadata/saml20-sp-remote.php`* file
+  # Find the *`$metadata['google.com']`* section (or your specific domain name)
+  # Add an *`'authproc' => array()`* array element (if not already created)
+  # In the *`'authproc'`* array added above, add the [Filters filter(s)] that you'd like to enable. See examples below
 
 ==== Examples ====
+
+For the most basic configuration, specify your [Options options] in the config file above and then enable the filter to look there.
+
+{{{
+$metadata['google.com'] = array(
+	// Your specific IDp settings...
+	'authproc' => array(
+		60 => array(
+			'class' => 'googleapps:Chain',
+			'config' => TRUE // Will look for googleapps.php
+		)
+	)
+);
+}}}
+
+If you have multiple config files you can specify a string as the config name.
+
+{{{
+$metadata['google.com'] = array(
+	// Your specific IDp settings...
+	'authproc' => array(
+		60 => array(
+			'class' => 'googleapps:Chain',
+			'config' => 'googleapps_example.org.php'
+		)
+	)
+);
+}}}
+
+Filter options always over-ride the config options (in the case where you provide both).
+
+{{{
+$metadata['google.com'] = array(
+	// Your specific IDp settings...
+	'authproc' => array(
+		60 => array(
+			'class' => 'googleapps:Provision',
+			'config' => TRUE,
+			'provision.delay' => 120
+		)
+	)
+);
+}}}
+
+And if you don't use a config file, all the options can be defined in the filter config.
+
+{{{
+$metadata['google.com'] = array(
+	// Your specific IDp settings...
+	'authproc' => array(
+		60 => array(
+			'class' => 'googleapps:Chain',
+			'apps.domain' => 'example.org',
+			'apps.username' => 'my_admin',
+			'apps.password' => 'Abc123!',
+			'chain.filters' => array('Provision', 'Organize')
+		)
+	)
+);
+}}}
+
+Finally, you can run the filters separately (not recommended).
+
+
+{{{
+$metadata['google.com'] = array(
+	// Your specific IDp settings...
+	'authproc' => array(
+		40 => array(
+			'class' => 'googleapps:Provision',
+			'apps.domain' => 'example.org',
+			'apps.username' => 'my_admin',
+			'apps.password' => 'Abc123!',
+			'provision.delay' => 300
+		),
+		60 => array(
+			'class' => 'googleapps:Organize',
+			'apps.domain' => 'example.org',
+			'apps.username' => 'other_admin',
+			'apps.password' => 'Xyz987!',
+			'attributes.dn' => 'myDNattrib'
+		)
+	)
+);
+}}}
