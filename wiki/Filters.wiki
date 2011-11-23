@@ -6,7 +6,7 @@ The different Google API tasks have been separated into different authentication
 
 == googleapps:Chain ==
 
-This is a special filter that does nothing on its' own. All it does is take a list/array of other filters that should be run. The benefit of using this, rather than configuring each filter separately, is that the config options and resources are shared between all filters, improving performance.
+This is a special filter that does nothing on its' own. All it does is take a [Options#chain.filters list/array of other googleapps filters] that should be run. The benefit of using this, rather than configuring each filter separately, is that the config options and resources are shared between all filters, improving performance.
 
 == googleapps:Provision ==
 
