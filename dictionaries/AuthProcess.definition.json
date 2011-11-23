@@ -1,0 +1,17 @@
+{
+    "202_title": {
+        "en": "Please Wait"
+    },
+	"202_header": {
+		"en": "Account Updated, Please Wait"
+	},
+	"202_default": {
+		"en": "Your Google Apps account has been created or renamed and it will take a few moments to be processed. Your browser should automatically refresh or else you can <a href=\"%URL%\">login again</a> at %UNTIL%."
+	},
+	"202_created": {
+		"en": "Your Google Apps account is being created and it will take a few moments to complete. Your browser should automatically refresh or else you can <a href=\"%URL\">login again</a> at %UNTIL%."
+	},
+	"202_renamed": {
+		"en": "Your Google Apps account has been renamed and it will take a few moments to complete the change. Your browser should automatically refresh or else you can <a href=\"%URL%\">login again</a> at %UNTIL%."
+	}
+}
