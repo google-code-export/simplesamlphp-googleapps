@@ -10,7 +10,7 @@
         "1.x-zip"     : {
             "type"    : "zip",
             "version" : "1.0.0",
-            "url"     : "http://simplesamlphp-googleapps.googlecode.com/files/googleapps-1.0.0.zip"
+            "url"     : "http://simplesamlphp-googleapps.googlecode.com/files/GoogleApps-1.0.0.zip"
         },
         "1.x-svn"     : {
             "type"    : "svn",
