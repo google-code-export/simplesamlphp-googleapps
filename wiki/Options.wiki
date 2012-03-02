@@ -4,26 +4,25 @@
 
 Most of the configuration options are used in multiple filters and can be defined in one configuration file to be shared between filters. The options listed below should be defined in either the config file or filter config with the option name as the key and values as the element (eg: `array('apps.username' => 'my_admin')`).
 
-|| *Option* || *Required* || *Filter(s)* || *Version(s)* || *Data Type(s)* || *Default Value* ||
-|| [Options#apps.domain apps.domain] || Yes || [Filters All] || 1.0+ || string || _empty string_ ||
-|| [Options#apps.username apps.username] || Yes || [Filters All] || 1.0+ || string || _empty string_ ||
-|| [Options#apps.password apps.password] || Yes || [Filters All] || 1.0+ || string || _empty string_ ||
-|| [Options#apps.timeout apps.timeout] || No || [Filters All] || 1.0+ || int || 30 ||
-|| [Options#chain.filters chain.filters] || No || [Filters#googleapps:Chain Chain] || 1.0+ || array || array() ||
-|| [Options#provision.password provision.password] || No || [Filters#googleapps:Provision Provision] || 1.0+ || string || _random string_ ||
-|| [Options#provision.syncpassword provision.syncpassword] || No || [Filters#googleapps:Provision Provision] || 1.1+ || bool || FALSE ||
-|| [Options#provision.interval provision.interval] || No || [Filters All] || 1.0+ || int || 86400 ||
-|| [Options#provision.delay provision.delay] || No || [Filters#googleapps:Provision Provision] || 1.0+ || int || 600 ||
-|| [Options#pdo.dsn pdo.dsn] || No || [Filters All] || 1.0+ || string || "sqlite:/simplesamlphp/data/googleapps_apps.domain.sqlite" ||
-|| [Options#pdo.username pdo.username] || No || [Filters All] || 1.0+ || string || NULL ||
-|| [Options#pdo.password pdo.password] || No || [Filters All] || 1.0+ || string || NULL ||
-|| [Options#pdo.prefix pdo.prefix] || No || [Filters All] || 1.0+ || string || "googleapps" ||
-|| [Options#pdo.options pdo.options] || No || [Filters All] || 1.0+ || array || array() ||
-|| [Options#attribute.userid attribute.userid] || No || [Filters All] || 1.0+ || string || "objectGUID" ||
-|| [Options#attribute.username attribute.username] || No || [Filters All] || 1.0+ || string || "sAMAccountName" ||
-|| [Options#attribute.firstname attribute.firstname] || No || [Filters#googleapps:Provision Provision] || 1.0+ || string || "givenName" ||
-|| [Options#attribute.lastname attribute.lastname] || No || [Filters#googleapps:Provision Provision] || 1.0+ || string || "sn" ||
-|| [Options#attribute.dn attribute.dn] || No || [Filters#googleapps:Organize Organize] || 1.0+ || string || "distinguishedName" ||
+|| *Option* || *Required* || *Filter(s)* || *Data Type(s)* || *Default Value* ||
+|| [Options#apps.domain apps.domain] || Yes || [Filters All] || string || _empty string_ ||
+|| [Options#apps.username apps.username] || Yes || [Filters All] || string || _empty string_ ||
+|| [Options#apps.password apps.password] || Yes || [Filters All] || string || _empty string_ ||
+|| [Options#apps.timeout apps.timeout] || No || [Filters All] || int || 30 ||
+|| [Options#chain.filters chain.filters] || No || [Filters#googleapps:Chain Chain] || array || array() ||
+|| [Options#provision.password provision.password] || No || [Filters#googleapps:Provision Provision] || string|bool || _random string_ ||
+|| [Options#provision.interval provision.interval] || No || [Filters All] || int || 86400 ||
+|| [Options#provision.delay provision.delay] || No || [Filters#googleapps:Provision Provision] || int || 600 ||
+|| [Options#pdo.dsn pdo.dsn] || No || [Filters All] || string || "sqlite:/simplesamlphp/data/googleapps_apps.domain.sqlite" ||
+|| [Options#pdo.username pdo.username] || No || [Filters All] || string || NULL ||
+|| [Options#pdo.password pdo.password] || No || [Filters All] || string || NULL ||
+|| [Options#pdo.prefix pdo.prefix] || No || [Filters All] || string || "googleapps" ||
+|| [Options#pdo.options pdo.options] || No || [Filters All] || array || array() ||
+|| [Options#attribute.userid attribute.userid] || No || [Filters All] || string || "objectGUID" ||
+|| [Options#attribute.username attribute.username] || No || [Filters All] || string || "sAMAccountName" ||
+|| [Options#attribute.firstname attribute.firstname] || No || [Filters#googleapps:Provision Provision] || string || "givenName" ||
+|| [Options#attribute.lastname attribute.lastname] || No || [Filters#googleapps:Provision Provision] || string || "sn" ||
+|| [Options#attribute.dn attribute.dn] || No || [Filters#googleapps:Organize Organize] || string || "distinguishedName" ||
 
 
 == apps.domain ==
@@ -57,16 +56,11 @@ _Note: The filter names can be the short name (eg: Provision), filter name (eg: 
 
 == provision.password ==
 
-When new accounts are created they require a default password, even though you are likely using SimpleSAMLphp as a SSO solution. By default, the filter will generate a random, 10 character `[a-zA-Z0-9]` password instead. If this option is defined, it will use the string as the password.
+When new accounts are created they require a default password, even though you are likely using SimpleSAMLphp as a SSO solution. By default, the filter will generate a random 10 character `[a-zA-Z0-9]` password. If this option is defined with a string, it will use that string as the password instead.
 
+Some Google Apps products to not support an SSO setup such as SimpleSAMLphp and default to whatever the actual Google Apps account password is. _As of version 1.1,_ if this option is set to boolean `TRUE`, AND the SimpleSAMLphp hack below has been applied, then the module will sync whatever password they entered into SimpleSAMLphp login with their Google Apps account.
 
-== provision.syncpassword ==
-
-_This option will override the `provision.password` option._
-
-Some Google Apps products to not support an SSO setup such as SimpleSAMLphp and default to whatever the actual Google Apps account password is. If this option is set to `TRUE`, AND the SimpleSAMLphp hack below has been applied, then the module will sync whatever password they entered into SimpleSAMLphp with their Google Apps account.
-
-Since SimpleSAMLphp does not allow modules access to the users password, a hack must be applied to capture the password for this module. Once captured, only the googleapps Provision module will have access to the password, no other modules will have access. Follow the directions below to apply the hack:
+Since SimpleSAMLphp does not allow modules access to the users password, a hack must be applied to capture the password for this module. Once captured, only the googleapps Provision module will have access to the password. Follow the directions below to apply the hack:
 
   # Open the file `simplesamlphp/modules/core/lib/Auth/UserPassBase.php` in a plain text editor, such as Notepad (Win) or TextEdit (Mac)
   # Go to line 176, or look for the line `$attributes = $source->login($username, $password);` towards the bottom
