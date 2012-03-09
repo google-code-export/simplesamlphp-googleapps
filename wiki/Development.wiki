@@ -1,0 +1,19 @@
+#summary Notes about developing/coding this module
+
+= Development Notes =
+
+This page contains some notes for those who develop and update this modules code. Just a place to store these notes.
+
+=== Logging ===
+
+Logging is very important for debugging. Proper logging is crucial to support this module.
+
+  * ANY changes to Google Apps should be;
+    # Logged as a notice
+    # State the changes From: and To: _(except sensitive data, ex: passwords)_
+  * Add a log message before a major process _(ex: Google Apps API call)_
+  * However, don't "over-log" as the log file could become large
+  * Any fatal messages should be thrown as a SimpleSAML_Error_Exception
+    * SimpleSAMLphp will automatically log the Exceptions message
+    * SimpleSAMLphp will then halt processing of the SAML request
+  * Try to include some user specific data to help determine which request the message is for _(ex: username)_
