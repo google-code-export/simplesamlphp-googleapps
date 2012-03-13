@@ -70,7 +70,7 @@ Since SimpleSAMLphp does not allow modules access to the users password, a hack 
 {{{
 			/* googleapps module hack to capture users password to sync with Google Apps */
 			if (SimpleSAML_Module::isModuleEnabled('googleapps')) {
-				sspmod_googleapps_Auth_Process_Provision::setPassword($password);
+				sspmod_googleapps_Auth_Process_Provision::setPassword($password, $username);
 			}
 }}}
 
