@@ -224,12 +224,13 @@ ATOM;
 <atom:entry xmlns:atom='http://www.w3.org/2005/Atom' xmlns:apps='http://schemas.google.com/apps/2006'>
 <id>https://apps-apis.google.com/a/feeds/customer/2.0/%%CUSTID%%</id>
     <apps:property name="name" value="%%OUNAME%%" />
-    <apps:property name="description" value="Created by SimpleSAMLphp-GoogleApps" />
+    <apps:property name="description" value="Created by SimpleSAMLphp-GoogleApps on %%DATE%%" />
     <apps:property name="parentOrgUnitPath" value="%%PARENTOU%%" />
 </atom:entry>
 ATOM;
 
 		// Enter the OU info into the XML, %%CUSTID%% is handled by the API class
+		$boyd = str_ireplace('%%DATE%%', htmlspecialchars(date('F n, Y')), $body);
 		$body = str_ireplace('%%OUNAME%%', htmlspecialchars($current), $body);
 		$body = str_ireplace('%%PARENTOU%%', htmlspecialchars($parent), $body);
 
