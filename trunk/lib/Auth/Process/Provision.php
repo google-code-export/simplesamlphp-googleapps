@@ -292,7 +292,7 @@ ATOM;
 				$this->getClassTitle(__FUNCTION__) .
 				'Users password NOT captured for [' .
 				$this->getAttribute('username') .
-				']. Verify the GoogleApps modification for SimpleSAML has been applied.'
+				']. Verify the SimpleSAML modification for the GoogleApps module has been applied (see docs).'
 			);
 		}
 
