@@ -9,9 +9,9 @@ Most of the configuration options are used in multiple filters and can be define
 || [Options#apps.username apps.username] || Yes || [Filters All] || string || _empty string_ ||
 || [Options#apps.password apps.password] || Yes || [Filters All] || string || _empty string_ ||
 || [Options#apps.timeout apps.timeout] || No || [Filters All] || int || 30 ||
+|| [Options#apps.interval apps.interval] || No || [Filters All] || int || 86400 ||
 || [Options#chain.filters chain.filters] || No || [Filters#googleapps:Chain Chain] || array || array() ||
 || [Options#provision.password provision.password] || No || [Filters#googleapps:Provision Provision] || string|bool || _random string_ ||
-|| [Options#provision.interval provision.interval] || No || [Filters All] || int || 86400 ||
 || [Options#provision.delay provision.delay] || No || [Filters#googleapps:Provision Provision] || int || 600 ||
 || [Options#pdo.dsn pdo.dsn] || No || [Filters All] || string || "sqlite:/simplesamlphp/data/googleapps_apps.domain.sqlite" ||
 || [Options#pdo.username pdo.username] || No || [Filters All] || string || NULL ||
@@ -47,6 +47,15 @@ Password for the above Google Apps admin user.
 Timeout value, in seconds, which is passed to the cURL extension for HTTP requests. This is the longest time the module will wait for Google Apps API to complete a task before failing.
 
 
+== apps.interval ==
+
+In order to prevent too much traffic to the Google Apps API, then exceeding quotas, this option specifies how often the module should check with the API for updates.
+
+The value of this option is an integer representing the number of seconds between checks. The default value of 86400 is actually 24 hours. (60 `*` 60 `*` 24) == (seconds `*` minutes `*` hours)
+
+_Note: Renamed in version 1.1 from provision.interval_
+
+
 == chain.filters ==
 
 If multiple filters/tasks need to be ran, then the Chain filter should be used as it will share config options and resources between all filters. This is an array of string elements with the names of filters that should be ran. The filters will be ran in the order defined, except [Filters#googleapps:Provision Provision] which will always run first.
@@ -73,13 +82,6 @@ Since SimpleSAMLphp does not allow modules access to the users password, a hack 
 				sspmod_googleapps_Auth_Process_Provision::setPassword($password, $username);
 			}
 }}}
-
-
-== provision.interval ==
-
-In order to prevent too much traffic to the Google Apps API, then exceeding quotas, this option specifies how often the module should check with the API for updates.
-
-The value of this option is an integer representing the number of seconds between checks. The default value of 86400 is actually 24 hours. (60 `*` 60 `*` 24) == (seconds `*` minutes `*` hours)
 
 
 == provision.delay ==
