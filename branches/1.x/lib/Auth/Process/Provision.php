@@ -23,6 +23,30 @@ class sspmod_googleapps_Auth_Process_Provision extends sspmod_googleapps_Auth_Pr
 
 
 	/**
+	 * Temporary storage for the current users password.
+	 * Used if module is configured to sync the users password
+	 * with Google Apps. Note: Requires a hack of the
+	 * SimpleSAMLphp source.
+	 *
+	 * @var string
+	 */
+	protected static $password;
+
+
+	/**
+	 * Typical setter method for the users current password.
+	 * No getter so that other code cannot access the password.
+	 *
+	 * @param string $password
+	 * @param string $username
+	 */
+	public static function setPassword($password, $username = '[unknown]') {
+		self::$password = trim((string) $password);
+		SimpleSAML_Logger::info("GoogleApps:Provision:setPassword() Password captured for user: [$username]");
+	}
+
+
+	/**
 	 * This is the method which is called when the filter is
 	 * executed. It will check with GoogleApps for existing
 	 * user info and updated it as needed, else provision a new
@@ -42,10 +66,10 @@ class sspmod_googleapps_Auth_Process_Provision extends sspmod_googleapps_Auth_Pr
 
 		// Get the required attribute values
 		$local = array(
-			'userid' => $this->getAttribute('userid'),
-			'username' => $this->getAttribute('username'),
+			'userid'    => $this->getAttribute('userid'),
+			'username'  => $this->getAttribute('username'),
 			'firstname' => $this->getAttribute('firstname'),
-			'lastname' => $this->getAttribute('lastname')
+			'lastname'  => $this->getAttribute('lastname')
 		);
 
 		// Get the users record from database
@@ -60,213 +84,230 @@ class sspmod_googleapps_Auth_Process_Provision extends sspmod_googleapps_Auth_Pr
 		);
 
 		// Request user info from GoogleApps
-		SimpleSAML_Logger::debug(
-			$this->getClassTitle(__FUNCTION__) .
-			'Checking for an existing user: ' . $username
-		);
-		$xml = $this->api->get(
-			'https://apps-apis.google.com/a/feeds/%%DOMAIN%%/user/2.0/' . urlencode($username)
-		);
+		SimpleSAML_Logger::debug($this->getClassTitle(__FUNCTION__) . "Checking for an existing user: [$username]");
+		$xml = $this->api->get('https://apps-apis.google.com/a/feeds/%%DOMAIN%%/user/2.0/' . urlencode($username));
 
-		// Not found, create a new user
-		if ($xml === FALSE) {
-			SimpleSAML_Logger::notice(
-				$this->getClassTitle(__FUNCTION__) .
-				'Existing user not found, creating new user and delaying login. ' .
-				$local['lastname'] . ', ' . $local['firstname'] . ' [' . $local['username'] . ']'
-			);
-			$this->createUser($local['username'], $local['firstname'], $local['lastname']);
-			$this->pdo->setUser($local['userid'], $local['username'], TRUE);
-			$this->delayLogin($request, 'created');
-		}
-
-		// Wrong response from GoogleApps
-		if (!($xml instanceof SimpleXMLElement)) {
+		// Bad return from GoogleApps API
+		if (!($xml instanceof SimpleXMLElement) && !is_bool($xml)) {
 			throw new SimpleSAML_Error_Exception(
 				$this->getClassTitle(__FUNCTION__) .
-				"Invalid XML returned from GoogleApps: $xml"
+				"Invalid XML returned from GoogleApps for user [$username]: $xml"
 			);
 		}
 
-		// Array to store GoogleApps account info
-		$remote = array();
+		// Init some vars for processing
+		$update = array();
+		$remote = $this->parseResults($xml);
+		$local_username  = strtolower($local['username']);
+		$remote_username = strtolower($remote['username']);
+		$status = (!$xml ? 'create' : 'update');
 
-		// Get the username
-		if ($xpath = $xml->xpath('//apps:login/@userName')) {
-			$remote['username'] = (string) $xpath[0];
-		} else {
-			throw new SimpleSAML_Error_Exception(
-				$this->getClassTitle(__FUNCTION__) .
-				'Unable to find the username from the GoogleApps response: ' .
-				$this->var_export($xml)
-			);
-		}
+		// Determine the differences
+		if ($local['firstname'] != $remote['firstname'])  $update['firstname'] = $local['firstname'];
+		if ($local['lastname']  != $remote['lastname'])   $update['lastname']  = $local['lastname'];
+		if ($local_username     != $remote_username)      $update['username']  = $local['username'];
+		if ($status == 'create' || $this->syncPassword()) $update['password']  = $this->getPassword();
 
-		// Get the first name
-		if ($xpath = $xml->xpath('//apps:name/@givenName')) {
-			$remote['firstname'] = (string) $xpath[0];
-		} else {
-			throw new SimpleSAML_Error_Exception(
-				$this->getClassTitle(__FUNCTION__) .
-				'Unable to find the first name from the GoogleApps response: ' .
-				$this->var_export($xml)
-			);
-		}
-
-		// Get the last name
-		if ($xpath = $xml->xpath('//apps:name/@familyName')) {
-			$remote['lastname'] = (string) $xpath[0];
-		} else {
-			throw new SimpleSAML_Error_Exception(
-				$this->getClassTitle(__FUNCTION__) .
-				'Unable to find the last name from the GoogleApps response: ' .
-				$this->var_export($xml)
-			);
-		}
-
-		// No difference in user information,
-		// continue with the SAML request.
-		if (strtolower($local['username']) == strtolower($remote['username']) &&
-		    $local['firstname'] == $remote['firstname'] &&
-		    $local['lastname'] == $remote['lastname']) {
+		// Nothing to update...
+		if (empty($update)) {
 			$this->pdo->setUser($local['userid'], $local['username']);
 			SimpleSAML_Logger::info(
 				$this->getClassTitle(__FUNCTION__) .
-				'Existing user found, no updated required. ' . $local['lastname'] .
-				', ' . $local['firstname'] . ' [' . $local['username'] . ']'
+				"Existing user found, no updates required for " .
+				"{$local['lastname']}, {$local['firstname']} [{$local['username']}]"
 			);
 			return;
 		}
 
-		// Log info
-		SimpleSAML_Logger::notice(
-			$this->getClassTitle(__FUNCTION__) .
-			'Existing user found, updates required. From: ' .
-			$remote['lastname'] . ', ' . $remote['firstname'] . ' [' . $remote['username'] . '] To: ' .
-			$local['lastname'] . ', ' . $local['firstname'] . ' [' . $local['username'] . ']'
-		);
+		// Logging message for debugging
+		SimpleSAML_Logger::info($this->getClassTitle(__FUNCTION__) . "Attempting to $status user account: [$username]");
 
-		// Update user information
-		$this->updateUser($remote['username'], $local['username'], $local['firstname'], $local['lastname']);
-		$delay = ($local['username'] != $remote['username'] ? TRUE : FALSE);
-		$this->pdo->setUser($local['userid'], $local['username'], $delay);
+		// Send user account info to Google Apps API
+		$type = ($status == 'create' ? 'post' : 'put');
+		$url  = 'https://apps-apis.google.com/a/feeds/%%DOMAIN%%/user/2.0';
+		$url .= ($status == 'update' ? '/' . urlencode($username) : '');
+		$xml  = $this->api->$type($url, $this->buildUserEntry($update));
 
-		// Forward user to the delayed page, if needed
-		if ($delay) {
-			$this->delayLogin($request, 'renamed');
+		// Check returned content type from API request
+		if (!($xml instanceof SimpleXMLElement)) {
+			throw new SimpleSAML_Error_Exception(
+				$this->getClassTitle(__FUNCTION__) .
+				"Unable to $status user account for [{$username}], result: $xml"
+			);
+		}
+
+		// Update the users record from the database
+		$this->pdo->setUser($local['userid'], $local['username'], (isset($update['username']) ? TRUE : FALSE));
+
+		// Logging message for debugging
+		$message = $this->getClassTitle(__FUNCTION__) . "User account {$status}d";
+		if ($status == 'create') {
+			$message .= " for {$local['lastname']}, {$local['firstname']} [{$local['username']}]";
+		} elseif (count($update) == 1 && isset($update['password'])) {
+			$message .= ", password synced for {$local['lastname']}, {$local['firstname']} [{$local['username']}]";
+		} else {
+			$message .= ". From: {$remote['lastname']}, {$remote['firstname']} [{$remote['username']}]";
+			$message .= " To: {$local['lastname']}, {$local['firstname']} [{$local['username']}]";
+		}
+		SimpleSAML_Logger::notice($message);
+
+		// If the username changes, login should be delayed
+		if (isset($update['username'])) {
+			$this->delayLogin($request, ($status == 'create' ? 'created' : 'renamed'));
 		}
 	}
 
 
 	/**
-	 * Takes user information and creates a new GoogleApps account.
+	 * Takes the XML User Entry Atom feed from a GoogleApps API query and
+	 * parses the XML date for specific attribute values.
 	 *
+	 * @param mixed $xml
+	 * @return array
 	 * @throws SimpleSAML_Error_Exception
-	 * @param string $username
-	 * @param string $firstname
-	 * @param string $lastname
-	 * @return void
 	 */
-	protected function createUser($username, $firstname, $lastname) {
-		assert('is_string($username) && $username != ""');
-		assert('is_string($firstname) && $firstname != ""');
-		assert('is_string($lastname) && $lastname != ""');
+	protected function parseResults($xml) {
 
-		// The XML framework to send to GoogleApps
-		$body = <<<ATOM
-<atom:entry xmlns:atom="http://www.w3.org/2005/Atom"
-  xmlns:apps="http://schemas.google.com/apps/2006">
-    <atom:category scheme="http://schemas.google.com/g/2005#kind"
-        term="http://schemas.google.com/apps/2006#user" />
-    <apps:login userName="%%USERNAME%%"
-        password="%%PASSWORD%%" hashFunctionName="SHA-1" />
-    <apps:name familyName="%%LASTNAME%%" givenName="%%FIRSTNAME%%" />
-</atom:entry>
-ATOM;
-
-		// Insert data into the XML
-		$password = sha1($this->config->getString('provision.password', $this->getRandomPassword()));
-		$body = str_ireplace('%%USERNAME%%', htmlspecialchars($username), $body);
-		$body = str_ireplace('%%PASSWORD%%', $password, $body);
-		$body = str_ireplace('%%FIRSTNAME%%', htmlspecialchars($firstname), $body);
-		$body = str_ireplace('%%LASTNAME%%', htmlspecialchars($lastname), $body);
-
-		// Send the request to GoogleApps
-		$xml = $this->api->post('https://apps-apis.google.com/a/feeds/%%DOMAIN%%/user/2.0', $body);
-
-		// Valid XML will be returned if successful
+		// No result to parse..
 		if (!($xml instanceof SimpleXMLElement)) {
-			throw new SimpleSAML_Error_Exception(
-				$this->getClassTitle(__FUNCTION__) .
-				"Unable to create a new user account, $username. $xml"
+			return array(
+				'username'  => '',
+				'firstname' => '',
+				'lastname'  => ''
 			);
 		}
 
-		// All done
-		SimpleSAML_Logger::info(
-			$this->getClassTitle(__FUNCTION__) .
-			"Created new user account: $lastname, $firstname [$username]"
+		// Array to store GoogleApps account info
+		$results = array(
+			'username'  => '//apps:login/@userName',
+			'firstname' => '//apps:name/@givenName',
+			'lastname'  => '//apps:name/@familyName'
 		);
+
+		/**
+		 * Search for each field using the xpath query
+		 * @var SimpleXMLElement $xml
+		 */
+		foreach ($results as $attribute => &$query) {
+			if ($xpath = $xml->xpath($query)) {
+				$query = (string) $xpath[0];
+			} else {
+				throw new SimpleSAML_Error_Exception(
+					$this->getClassTitle(__FUNCTION__) .
+					"Unable to find the $attribute from the GoogleApps response: " .
+					$this->var_export($xml)
+				);
+			}
+		}
+
+		// All results found
+		return $results;
 	}
 
 
 	/**
-	 * Takes user information and updates an existing GoogleApps account.
-	 * If the username has changed then the account is renamed as well.
+	 * Built a Google Apps User Entry Atom feed to be used with
+	 * a API call to create/update user account information.
 	 *
-	 * @throws SimpleSAML_Error_Exception
-	 * @param string $remote Existing GoogleApps username
-	 * @param string $local Local username, possibly different
-	 * @param string $firstname
-	 * @param string $lastname
-	 * @return void
+	 * @param array $attributes
+	 * @return string
 	 */
-	protected function updateUser($remote, $local, $firstname, $lastname) {
-		assert('is_string($remote) && $remote != ""');
-		assert('is_string($local) && $local != ""');
-		assert('is_string($firstname) && $firstname != ""');
-		assert('is_string($lastname) && $lastname != ""');
+	protected function buildUserEntry(array $attributes) {
+		assert('!empty($attributes)');
 
-		// The XML framework to send to GoogleApps
-		$body = <<<ATOM
+		// Prep attribute values for use in XML
+		foreach ($attributes as &$value) {
+			$value = htmlspecialchars($value);
+		}
+
+		// Open the User Entry Atom feed
+		$xml = <<<ATOM
 <atom:entry xmlns:atom="http://www.w3.org/2005/Atom"
   xmlns:apps="http://schemas.google.com/apps/2006">
     <atom:category scheme="http://schemas.google.com/g/2005#kind"
-        term="http://schemas.google.com/apps/2006#user"/>
-    <apps:name familyName="%%LASTNAME%%" givenName="%%FIRSTNAME%%"/>
+      term="http://schemas.google.com/apps/2006#user"/>
 
 ATOM;
 
-		// If username changed, update GoogleApps
-		$body .= ($local != $remote ? '    <apps:login userName="%%USERNAME%%"/>' . PHP_EOL : '');
+		// Add the login element, if/as needed
+		if (isset($attributes['username']) && isset($attributes['password'])) {
+			$xml .= '    <apps:login userName="' . $attributes['username'] . '"';
+			$xml .= ' password="' . $attributes['password'] . '" hashFunctionName="SHA-1" />';
+		} elseif (isset($attributes['username'])) {
+			$xml .= '    <apps:login userName="' . $attributes['username'] . '" />';
+		} elseif (isset($attributes['password'])) {
+			$xml .= '    <apps:login password="' . $attributes['password'] . '" hashFunctionName="SHA-1" />';
+		}
 
-		// Close the Atom entry
-		$body .= '</atom:entry>' . PHP_EOL;
+		// Line return between elements
+		$xml .= PHP_EOL;
 
-		// Insert data into the XML
-		$body = str_ireplace('%%USERNAME%%', htmlspecialchars($local), $body);
-		$body = str_ireplace('%%FIRSTNAME%%', htmlspecialchars($firstname), $body);
-		$body = str_ireplace('%%LASTNAME%%', htmlspecialchars($lastname), $body);
+		// Add the name element, if/as needed
+		if (isset($attributes['firstname']) && isset($attributes['lastname'])) {
+			$xml .= '    <apps:name familyName="' . $attributes['lastname'] . '"';
+			$xml .= ' givenName="' . $attributes['firstname'] . '" />';
+		} elseif (isset($attributes['firstname'])) {
+			$xml .= '    <apps:name givenName="' . $attributes['firstname'] . '" />';
+		} elseif (isset($attributes['lastname'])) {
+			$xml .= '    <apps:name familyName="' . $attributes['lastname'] . '" />';
+		}
 
-		// Send the request to GoogleApps
-		$xml = $this->api->put(
-			'https://apps-apis.google.com/a/feeds/%%DOMAIN%%/user/2.0/' . urlencode($remote),
-			$body
-		);
+		// Close the User Entry Atom feed
+		$xml .= PHP_EOL . '</atom:entry>' . PHP_EOL;
 
-		// Valid XML will be returned if successful
-		if (!($xml instanceof SimpleXMLElement)) {
+		// All done
+		return $xml;
+	}
+
+
+	/**
+	 * Returns weather or not to sync the users password based on the config option.
+	 * The provision.password MUST be boolean TRUE to enable sync, anything else is not.
+	 *
+	 * @return bool
+	 */
+	protected function syncPassword() {
+		try { return $this->config->getBoolean('provision.password', FALSE); }
+		catch (Exception $e) { return FALSE; }
+	}
+
+
+	/**
+	 * Getter for the password to use with the Google Apps account.
+	 * Could be a number of options depending on the module config.
+	 *
+	 * @return string
+	 * @throws SimpleSAML_Error_Exception
+	 */
+	protected function getPassword() {
+
+		// If not to sync, get the default password or generate random
+		if (!$this->syncPassword()) {
+			return sha1($this->config->getString('provision.password', $this->generatePassword()));
+		}
+
+		// Check if password was captured
+		if (!is_string(self::$password)) {
 			throw new SimpleSAML_Error_Exception(
 				$this->getClassTitle(__FUNCTION__) .
-				"Unable to update existing user account, $remote. $xml"
+				'Users password NOT captured for [' .
+				$this->getAttribute('username') .
+				']. Verify the SimpleSAML modification for the GoogleApps module has been applied (see docs).'
 			);
 		}
 
-		// All done
-		SimpleSAML_Logger::info(
-			$this->getClassTitle(__FUNCTION__) .
-			"Updated existing user: $lastname, $firstname [$local]"
-		);
+		// Make sure captured password is valid
+		if (!self::$password) {
+			throw new SimpleSAML_Error_Exception(
+				$this->getClassTitle(__FUNCTION__) .
+				'Users password captured for [' .
+				$this->getAttribute('username') .
+				'] but not a valid Google Apps password.'
+			);
+		}
+
+		// Return captured password
+		return sha1(self::$password);
 	}
 
 
@@ -274,11 +315,11 @@ ATOM;
 	 * When creating a new GoogleApps account, a password is
 	 * required. However, since SimpleSAML is doing the authentication
 	 * then it doesn't matter what the password is. For security reasons
-	 * we generate a random password for each new user.
+	 * we may generate a random password for each new user.
 	 *
 	 * @return string
 	 */
-	protected function getRandomPassword() {
+	protected function generatePassword() {
 
 		// The starting string containing many character options
 		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
@@ -299,7 +340,7 @@ ATOM;
 		shuffle($password);
 
 		// Convert the array back to a string
-		$password = implode($password);
+		$password = implode('', $password);
 
 		// GoogleApps wants the SHA1 value
 		return $password;

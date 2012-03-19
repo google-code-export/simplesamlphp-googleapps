@@ -170,7 +170,7 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 		);
 
 		// Set the attribute values to be looked up by getAttribute()
-		$this->attributes = $request['Attributes'];
+		$this->attributes =& $request['Attributes'];
 		SimpleSAML_Logger::debug(
 			$this->getClassTitle(__FUNCTION__, __CLASS__) .
 			'Set the request attributes: ' . implode(', ', array_keys($this->attributes))
@@ -197,7 +197,7 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 		// Check if user was recently updated, skip all provisioning tasks
 		// However, if th user was recently provisioned then finish running filters
 		if (isset($user['LastUpdated']) &&
-		    ($user['LastUpdated'] + $this->config->getInteger('provision.interval', 86400)) > time() &&
+		    ($user['LastUpdated'] + $this->config->getInteger('apps.interval', 86400)) > time() &&
 		     $user['LastUpdated'] > $user['DelayUntil']) {
 			SimpleSAML_Logger::info(
 				$this->getClassTitle(__FUNCTION__, __CLASS__) .
