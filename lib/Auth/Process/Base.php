@@ -170,7 +170,7 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 		);
 
 		// Set the attribute values to be looked up by getAttribute()
-		$this->attributes = $request['Attributes'];
+		$this->attributes =& $request['Attributes'];
 		SimpleSAML_Logger::debug(
 			$this->getClassTitle(__FUNCTION__, __CLASS__) .
 			'Set the request attributes: ' . implode(', ', array_keys($this->attributes))
