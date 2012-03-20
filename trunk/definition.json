@@ -9,17 +9,17 @@
     "access"      : {
         "1.x-zip"     : {
             "type"    : "zip",
-            "version" : "1.1.0",
-            "url"     : "http://simplesamlphp-googleapps.googlecode.com/files/GoogleApps-1.1.0.zip"
+            "version" : "1.1.1",
+            "url"     : "http://simplesamlphp-googleapps.googlecode.com/files/GoogleApps-1.1.1.zip"
         },
         "1.x-svn"     : {
             "type"    : "svn",
-            "version" : "1.1.0",
+            "version" : "1.1.1",
             "url"     : "http://simplesamlphp-googleapps.googlecode.com/svn/branches/1.x"
         },
         "dev"         : {
             "type"    : "svn",
-            "version" : "1.1.0",
+            "version" : "1.1.1",
             "url"     : "http://simplesamlphp-googleapps.googlecode.com/svn/trunk"
         }
     }

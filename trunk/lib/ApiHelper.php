@@ -18,7 +18,7 @@ class sspmod_googleapps_ApiHelper extends sspmod_googleapps_BaseHelper {
 	 * Will conform to the PHP versioning format to support
 	 * version_compare() http://www.php.net/version_compare
 	 */
-	const VERSION = '1.1.0';
+	const VERSION = '1.1.1';
 
 	/**
 	 * List of HTTP codes that GoogleApps may return. Used
