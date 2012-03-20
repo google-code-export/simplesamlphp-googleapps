@@ -17,3 +17,11 @@ Logging is very important for debugging. Proper logging is crucial to support th
     * SimpleSAMLphp will automatically log the Exceptions message
     * SimpleSAMLphp will then halt processing of the SAML request
   * Try to include some user specific data to help determine which request the message is for _(ex: username)_
+
+=== Branch Management ===
+
+All development work, from which the working copy is pulled, should be based on the trunk. Any changes that need to be applied to a branch should then be merged. Unless there are situations where a change should only be applied to a particular branch and not trunk. Tags should never be modified as they are a source to the release code.
+
+=== Release Process ===
+
+Details about the step for each new release to be added here.
