@@ -24,4 +24,14 @@ All development work, from which the working copy is pulled, should be based on 
 
 === Release Process ===
 
-Details about the step for each new release to be added here.
+Details about the step for each new release to be added here.'
+
+  # Update the version numbers in the `definition.json` file in trunk
+  # Update the version number in the `lib/ApiHelper.php` file in trunk
+  # Merge the above changes and any other code changes to the proper branch(s)
+  # Make a new Tag with the correct version number (X.Y.Z) from the proper branch (not trunk)
+  # Export the new tag code into a `googleapps` folder
+  # Zip the `googleapps` folder and rename the zip to GoogleApps-X.Y.Z.zip (with proper version number)
+  # Upload the zip file as a New Download, label as `Featured` and `Type-Archive`
+  # Edit the previous version zip download and add the `Deprecated` label
+  # Add a posting to the Announcements group, CC simplesamlphp@googlegroups.com
