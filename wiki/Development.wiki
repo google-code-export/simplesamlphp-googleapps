@@ -34,4 +34,6 @@ Details about the step for each new release to be added here.'
   # Zip the `googleapps` folder and rename the zip to GoogleApps-X.Y.Z.zip (with proper version number)
   # Upload the zip file as a New Download, label as `Featured` and `Type-Archive`
   # Edit the previous version zip download and add the `Deprecated` label
+  # In `Issue Tracking` add a new `AppliesTo` label for the new version
+  # In `Issue Tracking` add new `Target` and `FixedIn` labels for the next possible version
   # Add a posting to the Announcements group, CC simplesamlphp@googlegroups.com
