@@ -230,7 +230,7 @@ ATOM;
 ATOM;
 
 		// Enter the OU info into the XML, %%CUSTID%% is handled by the API class
-		$boyd = str_ireplace('%%DATE%%', htmlspecialchars(date('F n, Y')), $body);
+		$body = str_ireplace('%%DATE%%', htmlspecialchars(date('F n, Y')), $body);
 		$body = str_ireplace('%%OUNAME%%', htmlspecialchars($current), $body);
 		$body = str_ireplace('%%PARENTOU%%', htmlspecialchars($parent), $body);
 
