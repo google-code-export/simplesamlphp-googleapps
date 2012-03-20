@@ -43,13 +43,13 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 
 
     /**
-     * If the current filter was created by a chain
-     * then this is the chains instance. Used to avoid
-     * redundancy, running code twice.
-     *
-     * @var sspmod_googleapps_Auth_Process_Chain
-     */
-    protected $chain_class;
+	 * If the current filter was created by a chain
+	 * then this is the chains instance. Used to avoid
+	 * redundancy, running code twice.
+	 *
+	 * @var sspmod_googleapps_Auth_Process_Chain
+	 */
+	protected $chain_class;
 
 
 	/**
@@ -97,7 +97,7 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 			$this->api = $chain->api;
 			$this->attribute_map = $chain->attribute_map;
 			// $this->attributes = $chain->attributes; // Not needed, set by process()
-            $this->chain_class = get_class($chain); // TODO: Issue w/ saving chain instance instead
+			$this->chain_class = get_class($chain); // TODO: Issue w/ saving chain instance instead
 			$this->config = $chain->config;
 			$this->pdo = $chain->pdo;
 			SimpleSAML_Logger::debug(
@@ -242,7 +242,7 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 		if (!isset($this->attribute_map[$name])) {
 			throw new SimpleSAML_Error_Exception(
 				$this->getClassTitle(__FUNCTION__) .
-                "The attribute $name does not have a real name mapped."
+				"The attribute $name does not have a real name mapped."
 			);
 		}
 
@@ -352,7 +352,7 @@ abstract class sspmod_googleapps_Auth_Process_Base extends SimpleSAML_Auth_Proce
 	 * will be used in logging messages.
 	 *
 	 * @param string $method Should be the __FUNCTION__ magic constant value
-     * @param string $class If passed, the parent class name will be appended
+	 * @param string $class If passed, the parent class name will be appended
 	 * @return string
 	 */
 	protected function getClassTitle($method, $class = NULL) {

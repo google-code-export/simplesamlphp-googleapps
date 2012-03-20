@@ -15,7 +15,7 @@ class sspmod_googleapps_BaseHelper {
 	 * will be used in logging messages.
 	 *
 	 * @param string $method Should be the __FUNCTION__ magic constant value
-     * @param string $class If passed, the parent class name will be appended
+	 * @param string $class If passed, the parent class name will be appended
 	 * @return string
 	 */
 	protected static function getClassTitle($method, $class) {
