@@ -28,8 +28,8 @@ $config = array(
 	'apps.domain' => 'example.org',
 	'apps.username' => 'my_admin',
 	'apps.password' => 'Abc123!',
+	'apps.interval' => 57600, // 16 hours
 	'provision.delay' => 300, // 5 minutes
-	'provision.interval' => 57600, // 16 hours
 	'chain.filters' => array('Provision', 'Organize')
 );
 }}}
