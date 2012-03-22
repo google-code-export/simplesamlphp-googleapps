@@ -6,4 +6,5 @@
     * [Options]
     * [Filters]
   * [Support]
+  * [ChangeLog Change Log]
   * [Development]
