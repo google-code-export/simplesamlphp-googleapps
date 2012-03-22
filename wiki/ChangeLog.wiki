@@ -1,0 +1,16 @@
+#summary Project change log, version history
+
+<wiki:toc />
+
+== 1.1.1 - March 20, 2012 ==
+  * Fixed bug where date was not added to new OU's description. Issue 9 and commit r59
+  * Fixed some indentation typo's with commit r57
+
+== 1.1.0 - March 20, 2012 ==
+  * New feature to sync the users password with their Google Apps account. Issue 1 and commit r39
+  * New feature to include creation date on new OU descriptions. Commit r41
+  * Performance improvement by referencing attribute data rather than copying. Commit r46
+  * Changed config option `provision.interval` to `apps.interval` to better describe the option. Commit r43
+
+== 1.0.0 - November 23, 2011 ==
+TODO - Finish initial features
