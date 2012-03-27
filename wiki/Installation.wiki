@@ -29,3 +29,15 @@ The project has been separated into branches of development to provide access to
   * *`1.x-svn`* Stable releases using SVN commands in the pack.php tool (default)
   * *`1.x-zip`* Stable releases using Zip commands in the pack.php tool
   * *`dev`* Direct trunk access to the latest code, uses SVN commands. *NOT FOR PRODUCTION USE*
+
+=== SVN Checkout ===
+
+Since this module is on Google Project Hosting in an SVN repository, you could use client tools to checkout a copy. This way when there are new releases you can Switch/Update to the next release tag. This is very similar to the Pack.php Tool above, just a more manual process on your part.
+
+==== Checkout Options ====
+
+There are many locations where you could checkout from. Typically you would either checkout a tag or branch and update from there.
+
+  * *`/tags`* Each release will be tagged separately allowing you to `Switch` between tags as needed
+  * *`/branches`* Each branch will have changes merged allowing you to `Update` a checkout when updates are released
+  * *`/trunk`* All development occurs here allowing you to `Update` to get all changes *NOT FOR PRODUCTION USE*
