@@ -23,17 +23,6 @@ class sspmod_googleapps_Auth_Process_Provision extends sspmod_googleapps_Auth_Pr
 
 
 	/**
-	 * Temporary storage for the current users password.
-	 * Used if module is configured to sync the users password
-	 * with Google Apps. Note: Requires a hack of the
-	 * SimpleSAMLphp source.
-	 *
-	 * @var string
-	 */
-	protected static $password;
-
-
-	/**
 	 * Typical setter method for the users current password.
 	 * No getter so that other code cannot access the password.
 	 *
@@ -41,7 +30,8 @@ class sspmod_googleapps_Auth_Process_Provision extends sspmod_googleapps_Auth_Pr
 	 * @param string $username
 	 */
 	public static function setPassword($password, $username = '[unknown]') {
-		self::$password = trim((string) $password);
+		$session = SimpleSAML_Session::getInstance();
+		$session->setData('string', 'googleapps-upw', sha1($password), 900);
 		SimpleSAML_Logger::info("GoogleApps:Provision:setPassword() Password captured for user: [$username]");
 	}
 
@@ -286,8 +276,12 @@ ATOM;
 			return sha1($this->config->getString('provision.password', $this->generatePassword()));
 		}
 
+		// Attempt to retrieve password from session
+		$session = SimpleSAML_Session::getInstance();
+		$password = $session->getData('string', 'googleapps-upw');
+
 		// Check if password was captured
-		if (!is_string(self::$password)) {
+		if (!is_string($password)) {
 			throw new SimpleSAML_Error_Exception(
 				$this->getClassTitle(__FUNCTION__) .
 				'Users password NOT captured for [' .
@@ -297,7 +291,7 @@ ATOM;
 		}
 
 		// Make sure captured password is valid
-		if (!self::$password) {
+		if (!$password) {
 			throw new SimpleSAML_Error_Exception(
 				$this->getClassTitle(__FUNCTION__) .
 				'Users password captured for [' .
@@ -307,7 +301,7 @@ ATOM;
 		}
 
 		// Return captured password
-		return sha1(self::$password);
+		return $password;
 	}
 
 
