@@ -1,0 +1,26 @@
+{
+    "id"          : "googleapps",
+    "name"        : "Google Apps",
+    "descr"       : "Authentication process filters that integrate SimpleSAMLphp with Google Apps API for dynamic provisioning and management.",
+
+    "definition"  : "http://simplesamlphp-googleapps.googlecode.com/svn/trunk/definition.json",
+    "branch"      : "1.x-svn",
+
+    "access"      : {
+        "1.x-zip"     : {
+            "type"    : "zip",
+            "version" : "1.1.2",
+            "url"     : "http://simplesamlphp-googleapps.googlecode.com/files/GoogleApps-1.1.2.zip"
+        },
+        "1.x-svn"     : {
+            "type"    : "svn",
+            "version" : "1.1.2",
+            "url"     : "http://simplesamlphp-googleapps.googlecode.com/svn/branches/1.x"
+        },
+        "dev"         : {
+            "type"    : "svn",
+            "version" : "1.1.2",
+            "url"     : "http://simplesamlphp-googleapps.googlecode.com/svn/trunk"
+        }
+    }
+}
