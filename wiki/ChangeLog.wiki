@@ -1,7 +1,5 @@
 #summary Project change log, version history
 
-<wiki:toc />
-
 == 1.1.2 - April 2, 2012 ==
   * Fixed bug where password capture was lost when page refreshed on the client. Issue 8 and commit r67
 
