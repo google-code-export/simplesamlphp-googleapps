@@ -2,6 +2,9 @@
 
 <wiki:toc />
 
+== 1.1.2 - April 2, 2012 ==
+  * Fixed bug where password capture was lost when page refreshed on the client. Issue 8 and commit r67
+
 == 1.1.1 - March 20, 2012 ==
   * Fixed bug where date was not added to new OU's description. Issue 9 and commit r59
   * Fixed some indentation typo's with commit r57
