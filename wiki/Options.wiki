@@ -69,7 +69,7 @@ When new accounts are created they require a default password, even though you a
 
 Some Google Apps products do not support an SSO setup such as SimpleSAMLphp and default to whatever the actual Google Apps account password is. _As of version 1.1,_ if this option is set to boolean `TRUE`, AND the SimpleSAMLphp modification below has been applied, then the module will sync whatever password they entered into SimpleSAMLphp login with their Google Apps account.
 
-Since SimpleSAMLphp does not allow modules access to the users password, a modification must be applied to capture the password for this module. Once captured, only the googleapps Provision module will have access to the password. Follow the directions below to apply the mod:
+Since SimpleSAMLphp does not allow modules access to the users password, a modification must be applied to capture the password for this module. Once captured, the password is encrypted (sha1) and stored temporarily in a SimpleSAMLphp session, _never_ permanently to a database. Follow the directions below to apply the mod:
 
   # Open the file `simplesamlphp/modules/core/lib/Auth/UserPassBase.php` in a plain text editor, such as Notepad (Win) or TextEdit (Mac)
   # Go to line 176, or look for the line `$attributes = $source->login($username, $password);` towards the bottom
