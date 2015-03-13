@@ -1,0 +1,7 @@
+**FYI, the Provisioning API has been depreciated by Google. So if you have NOT already enabled Provisioning API you will not be able to, therefore you currently will not be able to use this module. For those who already have, Provisioning API will continue to function, for now. We will work on updating this module to work with the new Admin and Directory SDK's**
+
+This module integrates [SimpleSAMLphp](http://simplesamlphp.org/) with the [Google Apps API](https://developers.google.com/google-apps/provisioning/). It is intended to bring dynamic provisioning to your SSO solution so there is only one source between you and Google Apps. That way you don't need to import a list of users before they can access Google Apps and eliminate some of the manual management of other Google App settings.
+
+At this point, the module only supports provisioning accounts and organizing them into OU's. However, the goal of the project is to support many more Google Apps API's. If you are looking for a specific feature not included in the module, checkout the existing [feature requests](https://code.google.com/p/simplesamlphp-googleapps/issues/list?can=2&q=label%3AType-Enhancement) and Star it or fill out a [new Feature Request](https://code.google.com/p/simplesamlphp-googleapps/issues/entry?template=Feature%20Request) if one does not exist.
+
+Checkout the [project Wiki](HomePage.md) for documentation about installation and configuration options. If you need help, post on the [Discussion Group](http://groups.google.com/group/simplesamlphp-googleapps).
